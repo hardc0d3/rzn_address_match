@@ -1,0 +1,44 @@
+version: '3.7'
+
+services:
+  rzn_match_translate: # image: audit_workspace_django:latest
+    container_name: rzn_match_translate
+    image: rzn/matching
+    build:
+      context: ./
+    volumes:
+      - ./:/app
+    command: python translate.py
+    environment:
+      - TRANSLATE_DEFAULT_INPUT_CSV=resources/ResTecDevTask-sample_input_v1.csv
+      - TRANSLATE_DEFAULT_OUTPUT_CSV=output/ResTecDevTask-sample_input_v1_EN.csv
+  rzn_match_test: # image: audit_workspace_django:latest
+    container_name: rzn_match_test
+    image: rzn/matching
+    volumes:
+      - ./:/app
+    command: pytest
+  rzn_match_main_gl: # image: audit_workspace_django:latest
+    container_name: rzn_match_main
+    image: rzn/matching
+    volumes:
+      - ./:/app
+    command: python main.py -m gl -v
+    environment:
+      - MATCH_INPUT_CSV=resources/ResTecDevTask-sample_input_v1.csv
+      - MATCH_OUTPUT_CSV=output/ResTecDevTask-sample_output_v1.csv
+  rzn_match_main_ld: # image: audit_workspace_django:latest
+    container_name: rzn_match_main_ld
+    image: rzn/matching
+    volumes:
+      - ./:/app
+    command: python main.py -m ld -v
+    environment:
+      - MATCH_INPUT_CSV=output/ResTecDevTask-sample_input_v1_EN.csv
+      - MATCH_OUTPUT_CSV=output/ResTecDevTask-sample_output_v1_ld.csv
+    depends_on:
+      - rzn_match_translate
+
+
+
+
